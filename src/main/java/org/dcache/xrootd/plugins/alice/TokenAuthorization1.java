@@ -15,6 +15,13 @@ import org.dcache.xrootd2.protocol.XrootdProtocol;
 import org.dcache.xrootd2.protocol.XrootdProtocol.FilePerm;
 import org.dcache.xrootd2.security.AuthorizationHandler;
 
+/**
+ * The original Alice authentication scheme used in dCache.
+ *
+ * For unknown reasons the check and path mapping was not applied to
+ * stat or statx requests. This has been resolved in
+ * TokenAuthorization2.
+ */
 public class TokenAuthorization1 implements AuthorizationHandler
 {
     private final Map<String,KeyPair> keystore;
@@ -24,6 +31,12 @@ public class TokenAuthorization1 implements AuthorizationHandler
     public TokenAuthorization1(Map<String,KeyPair> keystore)
     {
         this.keystore = keystore;
+    }
+
+    protected boolean skipCheck(int requestId)
+    {
+        return (requestId == XrootdProtocol.kXR_stat ||
+                requestId == XrootdProtocol.kXR_statx);
     }
 
     @Override
@@ -38,9 +51,7 @@ public class TokenAuthorization1 implements AuthorizationHandler
             throw new IllegalArgumentException("the lfn string must not be null");
         }
 
-        // Historically we did not apply the check to stat requests
-        if (requestId == XrootdProtocol.kXR_stat ||
-            requestId == XrootdProtocol.kXR_statx) {
+        if (skipCheck(requestId)) {
             return;
         }
 

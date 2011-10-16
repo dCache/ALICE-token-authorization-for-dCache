@@ -38,7 +38,7 @@ public class TokenAuthorization1Factory implements AuthorizationFactory
                     "org.dcache.xrootd2.security.plugins.tokenauthz.TokenAuthorizationFactory"}));
 
 
-    private final Map<String,KeyPair> _keystore;
+    protected final Map<String,KeyPair> _keystore;
 
     public TokenAuthorization1Factory(File keystoreFile)
         throws ParseException, IOException
@@ -60,7 +60,7 @@ public class TokenAuthorization1Factory implements AuthorizationFactory
     @Override
     public String getDescription()
     {
-        return "Uses signed tokens to authorize request and map paths";
+        return "Alice token authorization (does not apply to stat or statx)";
     }
 
     @Override
