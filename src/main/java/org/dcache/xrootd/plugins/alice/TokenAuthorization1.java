@@ -33,12 +33,6 @@ public class TokenAuthorization1 implements AuthorizationHandler
         this.keystore = keystore;
     }
 
-    protected boolean skipCheck(int requestId)
-    {
-        return (requestId == XrootdProtocol.kXR_stat ||
-                requestId == XrootdProtocol.kXR_statx);
-    }
-
     @Override
     public void check(int requestId,
                       String pathToOpen,
@@ -51,12 +45,12 @@ public class TokenAuthorization1 implements AuthorizationHandler
             throw new IllegalArgumentException("the lfn string must not be null");
         }
 
-        if (skipCheck(requestId)) {
-            return;
-        }
-
         String authzTokenString = opaque.get("authz");
         if (authzTokenString == null) {
+            if (requestId == XrootdProtocol.kXR_stat ||
+                requestId == XrootdProtocol.kXR_statx) {
+                return;
+            }
             throw new GeneralSecurityException("No authorization token found in open request, access denied.");
         }
 
