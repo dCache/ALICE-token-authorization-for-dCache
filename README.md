@@ -47,7 +47,7 @@ Installation
 To install the provider you first setup a plugin directory for
 dCache. Add the following line to your dcache.conf
 
-   dcache.java.classpath=/usr/local/share/dcache/plugins/*
+    dcache.java.classpath=/usr/local/share/dcache/plugins/*
 
 and create the /usr/local/share/dcache/plugins/ directory.
 
@@ -61,7 +61,7 @@ Loading a plugin
 To load a plugin in the xrootd door, add the following line to
 dcache.conf:
 
-   xrootdAuthzPlugin=NAME
+    xrootdAuthzPlugin=NAME
 
 where NAME is the plugin name: The provider contains (or will
 contain) multiple plugins.
