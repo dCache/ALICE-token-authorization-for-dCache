@@ -94,10 +94,12 @@ Authors
 -------
 
 The code was originally written by Martin Radicke and sponsored by
-DESY. It has since been maintained by Gerd Behrmann and sponsored by
-NDGF.
+[DESY]. It has since been maintained by Gerd Behrmann and sponsored by
+[NDGF].
 
 [ALICE]:  http://aliweb.cern.ch/
 [dCache]: http://www.dcache.org/
 [xrootd]: http://xrootd.slac.stanford.edu/
 [WLCG]: http://lcg.web.cern.ch/lcg/
+[NDGF]: http://www.ndgf.org/
+[DESY]: http://www.desy.de/
