@@ -1,15 +1,19 @@
-ALICE authorization provider for dCache.
+ALICE authorization provider for dCache
+=======================================
+
+Selectio of authorization providers that allows dCache to be used as
+an ALICE storage element.
 
 About the provider
 ------------------
 
-dCache is a distributed storage system frequently used in the
-Worldwide LHC Computing Grid, high energy physics, photon sciences,
-and a couple of other communities.
+[dCache] is a distributed storage system frequently used in the
+[Worldwide LHC Computing Grid][WLCG], high energy physics, photon
+sciences, and a couple of other communities.
 
-ALICE is one of the LHC experiments. Alice heavily relies on the
-xrootd data access protocol. The xrootd protocol is supported by
-dCache out of the box. 
+[ALICE] is one of the LHC experiments. ALICE heavily relies on the
+[xrootd data access protocol][xrootd]. The xrootd protocol is
+supported by dCache out of the box.
 
 ALICE relies on a proprietary authorization scheme using
 cryptographically signed authorization tokens. This project provides
@@ -66,18 +70,22 @@ Plugin: alice-token-1
 ---------------------
 
 This is currently the only plugin included, although more plugins will
-be added. The plugin is identical to the token authorization plugin
-used in earlier releases of dCache.
+be added.
+
+The plugin is nearly identical to the token authorization plugin used
+in earlier releases of dCache. The only difference is that stat and
+statx optionally accept an authorization token. The original plugin
+ignored the authorization even if present.
 
 To identify the keystore, define the following in dcache.conf:
 
-   xrootdAuthzKeystore=/etc/dcache/keystore
+    xrootdAuthzKeystore=/etc/dcache/keystore
 
 No default is currently defined.
 
 A possible keystore file is:
 
-KEY VO:*   PRIVKEY:/etc/dcache/privkey.der  PUBKEY:/etc/dcache/pubkey.der
+    KEY VO:*   PRIVKEY:/etc/dcache/privkey.der  PUBKEY:/etc/dcache/pubkey.der
 
 With privkey.der and pubkey.der being the ALICE keypair.
 
@@ -88,3 +96,8 @@ Authors
 The code was originally written by Martin Radicke and sponsored by
 DESY. It has since been maintained by Gerd Behrmann and sponsored by
 NDGF.
+
+[ALICE]:  http://aliweb.cern.ch/
+[dCache]: http://www.dcache.org/
+[xrootd]: http://xrootd.slac.stanford.edu/
+[WLCG]: http://lcg.web.cern.ch/lcg/
