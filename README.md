@@ -1,7 +1,7 @@
 ALICE authorization provider for dCache
 =======================================
 
-Selectio of authorization providers that allows dCache to be used as
+Selection of authorization plugins that allows dCache to be used as
 an ALICE storage element.
 
 About the provider
