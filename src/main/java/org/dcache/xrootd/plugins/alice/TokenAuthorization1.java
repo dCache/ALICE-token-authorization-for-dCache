@@ -135,7 +135,7 @@ public class TokenAuthorization1 implements AuthorizationHandler
     @Override
     public boolean providesPFN()
     {
-        return true;
+        return (pfn != null);
     }
 
     @Override
