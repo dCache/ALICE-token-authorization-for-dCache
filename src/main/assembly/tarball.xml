@@ -1,0 +1,30 @@
+<assembly>
+    <id>tarball</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <includeBaseDirectory>true</includeBaseDirectory>
+    <fileSets>
+        <fileSet>
+            <includes>
+                <include>README*</include>
+                <include>LICENSE*</include>
+                <include>NOTICE*</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+          <directory>target</directory>
+          <outputDirectory></outputDirectory>
+          <includes>
+            <include>*.jar</include>
+          </includes>
+        </fileSet>
+        <fileSet>
+          <directory>src/main/defaults</directory>
+          <outputDirectory></outputDirectory>
+          <includes>
+            <include>*.properties</include>
+          </includes>
+        </fileSet>
+    </fileSets>
+</assembly>
