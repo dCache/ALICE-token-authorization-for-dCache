@@ -18,7 +18,7 @@ import java.util.NoSuchElementException;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
-import org.dcache.xrootd2.protocol.XrootdProtocol.FilePerm;
+import org.dcache.xrootd.protocol.XrootdProtocol.FilePerm;
 
 /**
  * This class represents an immutable authorization envelope. For a

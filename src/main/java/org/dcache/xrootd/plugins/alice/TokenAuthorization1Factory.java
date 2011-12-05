@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.LineNumberReader;
-import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
@@ -23,9 +22,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.dcache.xrootd2.security.AuthorizationFactory;
-import org.dcache.xrootd2.security.AuthorizationHandler;
-import org.dcache.xrootd2.util.ParseException;
+import org.dcache.xrootd.plugins.AuthorizationFactory;
+import org.dcache.xrootd.plugins.AuthorizationHandler;
+import org.dcache.xrootd.util.ParseException;
 
 public class TokenAuthorization1Factory implements AuthorizationFactory
 {
