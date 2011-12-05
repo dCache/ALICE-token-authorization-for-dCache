@@ -23,8 +23,8 @@
     </dependency>
     <dependency>
         <groupId>org.dcache</groupId>
-        <artifactId>dcache</artifactId>
-        <version>2.0.0</version>
+        <artifactId>xrootd4j</artifactId>
+        <version>1.0.0</version>
     </dependency>
     <dependency>
         <groupId>org.slf4j</groupId>

@@ -6,14 +6,14 @@ import java.security.KeyPair;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Map;
 import java.io.File;
 import java.net.InetSocketAddress;
 
-import org.dcache.xrootd2.protocol.XrootdProtocol;
-import org.dcache.xrootd2.protocol.XrootdProtocol.FilePerm;
-import org.dcache.xrootd2.security.AuthorizationHandler;
+import javax.security.auth.Subject;
+import org.dcache.xrootd.protocol.XrootdProtocol;
+import org.dcache.xrootd.protocol.XrootdProtocol.FilePerm;
+import org.dcache.xrootd.plugins.AuthorizationHandler;
 
 /**
  * The original Alice authentication scheme used in dCache.
@@ -25,8 +25,6 @@ import org.dcache.xrootd2.security.AuthorizationHandler;
 public class TokenAuthorization1 implements AuthorizationHandler
 {
     private final Map<String,KeyPair> keystore;
-    private String pfn;
-    private Envelope env;
 
     public TokenAuthorization1(Map<String,KeyPair> keystore)
     {
@@ -34,22 +32,24 @@ public class TokenAuthorization1 implements AuthorizationHandler
     }
 
     @Override
-    public void check(int requestId,
-                      String pathToOpen,
-                      Map<String,String> opaque,
-                      XrootdProtocol.FilePerm mode,
-                      InetSocketAddress endpoint)
-        throws SecurityException, GeneralSecurityException
+    public String authorize(Subject subject,
+                            InetSocketAddress localAddress,
+                            InetSocketAddress remoteAddress,
+                            String path,
+                            Map<String, String> opaque,
+                            int request,
+                            FilePerm mode)
+            throws SecurityException, GeneralSecurityException
     {
-        if (pathToOpen == null) {
+        if (path == null) {
             throw new IllegalArgumentException("the lfn string must not be null");
         }
 
         String authzTokenString = opaque.get("authz");
         if (authzTokenString == null) {
-            if (requestId == XrootdProtocol.kXR_stat ||
-                requestId == XrootdProtocol.kXR_statx) {
-                return;
+            if (request == XrootdProtocol.kXR_stat ||
+                request == XrootdProtocol.kXR_statx) {
+                return path;
             }
             throw new GeneralSecurityException("No authorization token found in open request, access denied.");
         }
@@ -60,28 +60,26 @@ public class TokenAuthorization1 implements AuthorizationHandler
 
         // decode the envelope from the token using the keypair
         // (Remote publicm key, local private key)
-        Envelope env = null;
+        Envelope env;
         try {
             env = decodeEnvelope(authzTokenString, keypair);
         } catch (CorruptedEnvelopeException e) {
             throw new GeneralSecurityException("Error parsing authorization token: "+e.getMessage());
         }
 
-        this.env = env;
-
         // loop through all files contained in the envelope and find
         // the one with the matching lfn if no match is found, the
         // token/envelope is possibly hijacked
-        Envelope.GridFile file = findFile(pathToOpen, env);
+        Envelope.GridFile file = findFile(path, env);
         if (file == null) {
-            throw new GeneralSecurityException("authorization token doesn't contain any file permissions for lfn "+pathToOpen);
+            throw new GeneralSecurityException("authorization token doesn't contain any file permissions for lfn " + path);
         }
 
         // check for hostname:port in the TURL. Must match the current
         // xrootd service endpoint.  If this check fails, the token is
         // possibly hijacked
         if (!Arrays.equals(file.getTurlHost().getAddress(),
-                           endpoint.getAddress().getAddress())) {
+                           localAddress.getAddress().getAddress())) {
             throw new GeneralSecurityException("Hostname mismatch in authorization token (lfn="+file.getLfn()+" TURL="+file.getTurl()+")");
         }
 
@@ -89,7 +87,7 @@ public class TokenAuthorization1 implements AuthorizationHandler
             (file.getTurlPort() == -1)
             ? XrootdProtocol.DEFAULT_PORT
             : file.getTurlPort();
-        if (turlPort != endpoint.getPort()) {
+        if (turlPort != localAddress.getPort()) {
             throw new GeneralSecurityException("Port mismatch in authorization token (lfn="+file.getLfn()+" TURL="+file.getTurl()+")");
         }
 
@@ -108,13 +106,13 @@ public class TokenAuthorization1 implements AuthorizationHandler
             }
         }
 
-        setPfn(file.getTurlPath());
+        return file.getTurlPath();
     }
 
-    private Envelope.GridFile findFile(String pathToOpen, Envelope env)
+    private Envelope.GridFile findFile(String path, Envelope env)
     {
         for (Envelope.GridFile file: env.getFiles()) {
-            if (pathToOpen.equals(file.getLfn())) {
+            if (path.equals(file.getLfn())) {
                 return file;
             }
         }
@@ -130,23 +128,6 @@ public class TokenAuthorization1 implements AuthorizationHandler
                                     (RSAPublicKey) keypair.getPublic());
         token.decrypt();
         return token.getEnvelope();
-    }
-
-    @Override
-    public boolean providesPFN()
-    {
-        return (pfn != null);
-    }
-
-    @Override
-    public String getPFN()
-    {
-        return pfn;
-    }
-
-    private void setPfn(String pfn)
-    {
-        this.pfn = pfn;
     }
 
     private KeyPair getKeys(String vo) throws GeneralSecurityException
@@ -174,16 +155,6 @@ public class TokenAuthorization1 implements AuthorizationHandler
 
         return keypair;
 
-    }
-
-    /**
-     * Returns the FQDN of the token creator
-     *
-     */
-    @Override
-    public String getUser()
-    {
-        return env == null ? null : env.getCreator();
     }
 
     public static void main(String[] args)

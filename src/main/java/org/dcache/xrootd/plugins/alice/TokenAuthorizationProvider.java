@@ -4,9 +4,9 @@ import java.util.Properties;
 import java.io.File;
 import java.io.IOException;
 
-import org.dcache.xrootd2.security.AuthorizationProvider;
-import org.dcache.xrootd2.security.AuthorizationFactory;
-import org.dcache.xrootd2.util.ParseException;
+import org.dcache.xrootd.plugins.AuthorizationProvider;
+import org.dcache.xrootd.plugins.AuthorizationFactory;
+import org.dcache.xrootd.util.ParseException;
 
 public class TokenAuthorizationProvider implements AuthorizationProvider
 {
