@@ -37,7 +37,7 @@ Using the plugin with xrootd4j standalone
 Untar the tarball:
 
     cd /tmp
-    tar xzf xrootd-authz-plugin-alice-VERSION.tar.gz
+    tar xzf xrootd4j-authz-plugin-alice-VERSION.tar.gz
 
 Add the directory in which the tarball was unpacked (not the directory
 contained in the tarball) to the plugin search path:
