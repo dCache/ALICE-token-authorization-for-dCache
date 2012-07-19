@@ -48,7 +48,8 @@ public class TokenAuthorization1 implements AuthorizationHandler
         String authzTokenString = opaque.get("authz");
         if (authzTokenString == null) {
             if (request == XrootdProtocol.kXR_stat ||
-                request == XrootdProtocol.kXR_statx) {
+                request == XrootdProtocol.kXR_statx ||
+                request == XrootdProtocol.kXR_dirlist) {
                 return path;
             }
             throw new GeneralSecurityException("No authorization token found in open request, access denied.");
