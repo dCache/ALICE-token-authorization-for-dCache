@@ -3,7 +3,7 @@
 
   <groupId>org.dcache</groupId>
   <artifactId>xrootd4j-authz-plugin-alice</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   <packaging>jar</packaging>
 
   <name>xrootd4j-authz-plugin-alice</name>
