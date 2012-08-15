@@ -14,9 +14,9 @@
   </properties>
 
   <scm>
-    <connection>scm:git:git://github.com/gbehrmann/ALICE-token-authorization-for-dCache.git</connection>
-    <developerConnection>scm:git:git@github.com:gbehrmann/ALICE-token-authorization-for-dCache.git</developerConnection>
-    <url>http://github.com/gbehrmann/ALICE-token-authorization-for-dCache</url>
+    <connection>scm:git:git://github.com/dCache/ALICE-token-authorization-for-dCache.git</connection>
+    <developerConnection>scm:git:git@github.com:dCache/ALICE-token-authorization-for-dCache.git</developerConnection>
+    <url>http://github.com/dCache/ALICE-token-authorization-for-dCache</url>
   </scm>
 
   <repositories>
@@ -47,13 +47,13 @@
     <site>
       <id>github</id>
       <name>ALICE-token-authorization-for-dCache</name>
-      <url>http://github.com/gbehrmann/ALICE-token-authorization-for-dCache/</url>
+      <url>http://github.com/dCache/ALICE-token-authorization-for-dCache/</url>
     </site>
   </distributionManagement>
 
   <issueManagement>
       <system>GitHub</system>
-      <url>http://github.com/gbehrmann/ALICE-token-authorization-for-dCache/issues/</url>
+      <url>http://github.com/dCache/ALICE-token-authorization-for-dCache/issues/</url>
   </issueManagement>
 
   <mailingLists>
