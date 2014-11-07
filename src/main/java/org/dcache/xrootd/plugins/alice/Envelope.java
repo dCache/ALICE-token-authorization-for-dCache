@@ -1,5 +1,8 @@
 package org.dcache.xrootd.plugins.alice;
 
+import javax.security.auth.login.CredentialException;
+import javax.security.auth.login.CredentialExpiredException;
+
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.StringReader;
@@ -37,7 +40,7 @@ public class Envelope
     public class GridFile
     {
         private String lfn;
-        private int access;
+        private FilePerm access;
         //              private String guid;
         //              private URL pturl;
         //              private String pguid;
@@ -57,7 +60,7 @@ public class Envelope
                 throw new CorruptedEnvelopeException("file permisson flag for lfn "+lfn+" must be one out of 'read', 'write-once', 'write' or 'delete'");
             }
 
-            this.access = filePermissions.get(access).ordinal();
+            this.access = filePermissions.get(access);
 
             try {
                 this.turl = parseTurl();
@@ -84,7 +87,7 @@ public class Envelope
             return new URI(rootURLString);
         }
 
-        public int getAccess()
+        public FilePerm getAccess()
         {
             return access;
         }
@@ -185,7 +188,7 @@ public class Envelope
      * @throws GeneralSecurityException if envelope has already expired
      */
     public Envelope(String envelope)
-        throws CorruptedEnvelopeException, GeneralSecurityException
+            throws CorruptedEnvelopeException, CredentialException
     {
         parse(envelope);
         checkValidity();
@@ -393,21 +396,18 @@ public class Envelope
     /**
      * Checks the envelope for valid expiration date and minimum
      * number of specified files
-     *
-     * @throws GeneralSecurityException if envelope has expired
-     * @throws CorruptedEnvelopeException if the number of specified files is less then 1
      */
     private void checkValidity()
-        throws GeneralSecurityException, CorruptedEnvelopeException
+            throws CorruptedEnvelopeException, CredentialException
     {
         long current = System.currentTimeMillis() / 1000;
 
         if ((created - TIME_OFFSET) > current) {
-            throw new GeneralSecurityException("Envelope creation time lies in the future: "+new Date(created*1000));
+            throw new CredentialException("Envelope creation time lies in the future: "+new Date(created*1000));
         }
 
         if ((expires != 0) && (current) > expires) {
-            throw new GeneralSecurityException("Envelope expired "+new Date(expires * 1000));
+            throw new CredentialExpiredException("Envelope expired "+new Date(expires * 1000));
         }
 
         if (files.size() < 1 ) {
@@ -484,7 +484,7 @@ public class Envelope
     @Override
     public String toString()
     {
-        return String.format("Envelope[%s,%d,%d,%s,%s]",
-                             creator, created, expires, files, filePermissions);
+        return String.format("Envelope[%s,%d,%d,%s]",
+                             creator, created, expires, files);
     }
 }
