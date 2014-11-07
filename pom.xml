@@ -3,7 +3,7 @@
 
   <groupId>org.dcache</groupId>
   <artifactId>xrootd4j-authz-plugin-alice</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>xrootd4j-authz-plugin-alice</name>
@@ -17,7 +17,7 @@
     <connection>scm:git:git://github.com/gbehrmann/ALICE-token-authorization-for-dCache.git</connection>
     <developerConnection>scm:git:git@github.com:gbehrmann/ALICE-token-authorization-for-dCache.git</developerConnection>
     <url>http://github.com/gbehrmann/ALICE-token-authorization-for-dCache</url>
-    <tag>v1.0.2</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <repositories>
