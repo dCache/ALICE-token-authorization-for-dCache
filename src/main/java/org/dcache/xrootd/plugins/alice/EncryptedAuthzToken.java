@@ -4,16 +4,25 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.StringReader;
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.security.Signature;
+import java.security.SignatureException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Stack;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.google.common.base.Throwables;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
@@ -82,8 +91,7 @@ public class EncryptedAuthzToken {
      * @param pubKey the remote public RSA key
      * @throws GeneralSecurityException
      */
-    public EncryptedAuthzToken(String rawToken, RSAPrivateKey privKey, RSAPublicKey pubKey)
-        throws GeneralSecurityException
+    public EncryptedAuthzToken(String rawToken, RSAPrivateKey privKey, RSAPublicKey pubKey) throws CorruptedEnvelopeException
     {
         this.privKey = privKey;
         this.pubKey = pubKey;
@@ -95,9 +103,8 @@ public class EncryptedAuthzToken {
      * method should not be called for more than one times.
      *
      * @return the decrypted envelope or NULL if signature could not be verified
-     * @throws GeneralSecurityException
      */
-    public String decrypt() throws GeneralSecurityException
+    public String decrypt() throws NoSuchProviderException, InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidAlgorithmParameterException, BadPaddingException, IllegalBlockSizeException, SignatureException
     {
         // get RSA-sealed cipher (aka session- or symmetric key(
         decryptSealedCipher();
@@ -116,10 +123,8 @@ public class EncryptedAuthzToken {
     /**
      * Decrypts the first component of the sealed token, which
      * contains the session key (aka symmetric key).
-     *
-     * @throws GeneralSecurityException
      */
-    private void decryptSealedCipher() throws GeneralSecurityException
+    private void decryptSealedCipher() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException
     {
         // decode base64
         byte[] encryptedCipher = Base64.decode(cipherEncryptedBase64.toString());
@@ -137,7 +142,7 @@ public class EncryptedAuthzToken {
      *
      * @throws GeneralSecurityException
      */
-    private void decryptSealedEnvelope() throws GeneralSecurityException
+    private void decryptSealedEnvelope() throws NoSuchPaddingException, NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException
     {
         // Base64-decode envelope
         byte[] encryptedEnvelope =
@@ -224,9 +229,8 @@ public class EncryptedAuthzToken {
      * hash of the envlope with the signature
      *
      * @return true after successful verification
-     * @throws GeneralSecurityException
      */
-    private boolean verifyEnvelope() throws GeneralSecurityException
+    private boolean verifyEnvelope() throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException
     {
         Signature signer = Signature.getInstance("SHA1withRSA","BC");
         signer.initVerify(pubKey);
@@ -239,9 +243,8 @@ public class EncryptedAuthzToken {
      * its two components cipher and envelope
      *
      * @param rawToken the token which is going to be splitted
-     * @throws GeneralSecurityException
      */
-    private void splitToken(String rawToken) throws GeneralSecurityException
+    private void splitToken(String rawToken) throws CorruptedEnvelopeException
     {
         cipherEncryptedBase64 = new StringBuffer();
         envelopeEncryptedBase64 = new StringBuffer();
@@ -252,7 +255,7 @@ public class EncryptedAuthzToken {
             new LineNumberReader(new StringReader(rawToken));
 
         try {
-            String line = null;
+            String line;
             while ((line = input.readLine()) != null) {
                 if (line.equals(CYPHER_START)) {
                     stack.push(CYPHER_START);
@@ -261,7 +264,7 @@ public class EncryptedAuthzToken {
 
                 if (line.equals(CYPHER_END)) {
                     if (!stack.peek().equals(CYPHER_START)) {
-                        throw new GeneralSecurityException("Illegal format: Cannot parse encrypted cipher");
+                        throw new CorruptedEnvelopeException("Illegal format: Cannot parse encrypted cipher");
                     }
                     stack.pop();
                     continue;
@@ -270,7 +273,7 @@ public class EncryptedAuthzToken {
                 if (line.equals(ENVELOPE_START)) {
                     // check if ENVELOPE part is not nested in CYPHER part
                     if (!stack.isEmpty()) {
-                        throw new GeneralSecurityException("Illegal format: Cannot parse encrypted envelope");
+                        throw new CorruptedEnvelopeException("Illegal format: Cannot parse encrypted envelope");
                     }
                     stack.push(ENVELOPE_START);
                     continue;
@@ -278,7 +281,7 @@ public class EncryptedAuthzToken {
 
                 if (line.equals(ENVELOPE_END)) {
                     if (!stack.peek().equals(ENVELOPE_START)) {
-                        throw new GeneralSecurityException("Illegal format: Cannot parse encrypted envelope");
+                        throw new CorruptedEnvelopeException("Illegal format: Cannot parse encrypted envelope");
                     }
                     stack.pop();
                     continue;
@@ -300,13 +303,7 @@ public class EncryptedAuthzToken {
             }
 
         } catch (IOException e) {
-            throw new GeneralSecurityException("error reading from token string");
-        }
-
-        try {
-            input.close();
-        } catch (IOException e) {
-            throw new GeneralSecurityException("error closing stream where token string was parsed from");
+            Throwables.propagate(e);
         }
     }
 
@@ -337,17 +334,5 @@ public class EncryptedAuthzToken {
         sb.append(" bytes)");
 
         return sb.toString();
-    }
-
-    /**
-     * This method parses the decrypted envelope and returns its representation object.
-     * @return an envelope object
-     * @throws GeneralSecurityException is thrown if envelope has expired
-     * @throws CorruptedEnvelopeException  is thrown if a parsing error occurs
-     */
-    public Envelope getEnvelope()
-        throws CorruptedEnvelopeException, GeneralSecurityException
-    {
-        return new Envelope(new String(envelope));
     }
 }
