@@ -338,16 +338,4 @@ public class EncryptedAuthzToken {
 
         return sb.toString();
     }
-
-    /**
-     * This method parses the decrypted envelope and returns its representation object.
-     * @return an envelope object
-     * @throws GeneralSecurityException is thrown if envelope has expired
-     * @throws CorruptedEnvelopeException  is thrown if a parsing error occurs
-     */
-    public Envelope getEnvelope()
-        throws CorruptedEnvelopeException, GeneralSecurityException
-    {
-        return new Envelope(new String(envelope));
-    }
 }

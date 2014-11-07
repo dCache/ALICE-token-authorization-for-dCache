@@ -37,7 +37,7 @@ public class Envelope
     public class GridFile
     {
         private String lfn;
-        private int access;
+        private FilePerm access;
         //              private String guid;
         //              private URL pturl;
         //              private String pguid;
@@ -57,7 +57,7 @@ public class Envelope
                 throw new CorruptedEnvelopeException("file permisson flag for lfn "+lfn+" must be one out of 'read', 'write-once', 'write' or 'delete'");
             }
 
-            this.access = filePermissions.get(access).ordinal();
+            this.access = filePermissions.get(access);
 
             try {
                 this.turl = parseTurl();
@@ -84,7 +84,7 @@ public class Envelope
             return new URI(rootURLString);
         }
 
-        public int getAccess()
+        public FilePerm getAccess()
         {
             return access;
         }
@@ -484,7 +484,7 @@ public class Envelope
     @Override
     public String toString()
     {
-        return String.format("Envelope[%s,%d,%d,%s,%s]",
-                             creator, created, expires, files, filePermissions);
+        return String.format("Envelope[%s,%d,%d,%s]",
+                             creator, created, expires, files);
     }
 }

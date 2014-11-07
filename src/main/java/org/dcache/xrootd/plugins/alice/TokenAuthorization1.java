@@ -95,13 +95,13 @@ public class TokenAuthorization1 implements AuthorizationHandler
         // the authorization check. read access (lowest permission
         // required) is granted by default (file.getAccess() == 0), we
         // must check only in case of writing
-        int grantedPermission = file.getAccess();
+        FilePerm grantedPermission = file.getAccess();
         if (mode == FilePerm.WRITE) {
-            if (grantedPermission < FilePerm.WRITE_ONCE.ordinal()) {
+            if (grantedPermission.ordinal() < FilePerm.WRITE_ONCE.ordinal()) {
                 throw new AccessControlException("Token lacks authorization for requested operation");
             }
         } else if (mode == FilePerm.DELETE) {
-            if (grantedPermission < FilePerm.DELETE.ordinal()) {
+            if (grantedPermission.ordinal() < FilePerm.DELETE.ordinal()) {
                 throw new AccessControlException("Token lacks authorization for requested operation");
             }
         }
@@ -126,8 +126,7 @@ public class TokenAuthorization1 implements AuthorizationHandler
             new EncryptedAuthzToken(authzTokenString,
                                     (RSAPrivateKey) keypair.getPrivate(),
                                     (RSAPublicKey) keypair.getPublic());
-        token.decrypt();
-        return token.getEnvelope();
+        return new Envelope(token.decrypt());
     }
 
     private KeyPair getKeys(String vo) throws GeneralSecurityException
