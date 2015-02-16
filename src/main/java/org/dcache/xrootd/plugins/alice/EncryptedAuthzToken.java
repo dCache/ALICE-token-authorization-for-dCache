@@ -89,7 +89,6 @@ public class EncryptedAuthzToken {
      * @param rawToken rawToken the sealed token which is going to be decrypted
      * @param privKey  the local private RSA key
      * @param pubKey the remote public RSA key
-     * @throws GeneralSecurityException
      */
     public EncryptedAuthzToken(String rawToken, RSAPrivateKey privKey, RSAPublicKey pubKey) throws CorruptedEnvelopeException
     {
