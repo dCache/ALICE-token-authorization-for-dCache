@@ -185,7 +185,6 @@ public class Envelope
      * Parses the envelope and verifies its validity.
      * @param envelope the envelope in plain text to be parsed
      * @throws CorruptedEnvelopeException if parsing fails
-     * @throws GeneralSecurityException if envelope has already expired
      */
     public Envelope(String envelope)
             throws CorruptedEnvelopeException, CredentialException
