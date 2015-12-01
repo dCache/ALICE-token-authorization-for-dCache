@@ -41,20 +41,12 @@ public class Envelope
     {
         private String lfn;
         private FilePerm access;
-        //              private String guid;
-        //              private URL pturl;
-        //              private String pguid;
-
-        private String turlString;
         private URI turl;
-        private String turlProtocol;
-        private InetAddress turlHost;
 
         public GridFile(String lfn, String turl, String access)
             throws CorruptedEnvelopeException
         {
             this.lfn = lfn;
-            this.turlString = turl;
 
             if (!filePermissions.containsKey(access)) {
                 throw new CorruptedEnvelopeException("file permisson flag for lfn "+lfn+" must be one out of 'read', 'write-once', 'write' or 'delete'");
@@ -63,28 +55,19 @@ public class Envelope
             this.access = filePermissions.get(access);
 
             try {
-                this.turl = parseTurl();
-                this.turlHost = InetAddress.getByName(this.turl.getHost());
+                this.turl = parseTurl(turl);
             } catch (URISyntaxException e) {
-                throw new CorruptedEnvelopeException("Malformed TURL: "+e.getMessage());
-            } catch (UnknownHostException e) {
-                throw new CorruptedEnvelopeException(e.getMessage());
+                throw new CorruptedEnvelopeException("Malformed TURL: " + e.getMessage());
             }
         }
 
-        private URI parseTurl() throws URISyntaxException
+        private URI parseTurl(String turl) throws URISyntaxException
         {
-            String rootURLString = getTurl();
-
-            if (!rootURLString.toLowerCase().startsWith("root://")) {
-                throw new URISyntaxException(rootURLString,
-                                             "TURL does not start with root://");
+            URI uri = new URI(turl);
+            if (!uri.getScheme().equalsIgnoreCase("root")) {
+                throw new URISyntaxException(turl, "TURL does not start with root://");
             }
-            this.turlProtocol = "root";
-
-            //                  dirty little trick because java.net.URL does not understand root protocol but offers
-            //                  nice URL parsing capabilities
-            return new URI(rootURLString);
+            return uri;
         }
 
         public FilePerm getAccess()
@@ -97,45 +80,15 @@ public class Envelope
             return lfn;
         }
 
-        public String getTurl()
+        public URI getTurl()
         {
-            return turlString;
-        }
-
-        public String getTurlProtocol()
-        {
-            return turlProtocol;
-        }
-
-        public InetAddress getTurlHost()
-        {
-            return turlHost;
-        }
-
-        public int getTurlPort()
-        {
-            return turl.getPort();
-        }
-
-        public String getTurlPath()
-        {
-            return turl.getPath();
-        }
-
-        /**
-         * Returns the username and password, if present
-         * @return username OR username:password or null if no info available
-         */
-        public String getUserInfo()
-        {
-            return turl.getUserInfo();
+            return turl;
         }
 
         @Override
         public String toString()
         {
-            return String.format("GridFile[%s,%d,%s]",
-                                 lfn, access, turlString);
+            return String.format("GridFile[%s,%s,%s]", lfn, access, turl);
         }
     }
 
