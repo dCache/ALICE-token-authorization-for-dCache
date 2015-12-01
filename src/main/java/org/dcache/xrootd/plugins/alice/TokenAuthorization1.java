@@ -7,7 +7,9 @@ import javax.security.auth.Subject;
 import javax.security.auth.login.CredentialException;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
@@ -95,14 +97,18 @@ public class TokenAuthorization1 implements AuthorizationHandler
         // check for hostname:port in the TURL. Must match the current
         // xrootd service endpoint.  If this check fails, the token is
         // possibly hijacked
-        if (!Arrays.equals(file.getTurlHost().getAddress(), localAddress.getAddress().getAddress())) {
-            throw new XrootdException(kXR_NotAuthorized, "Hostname mismatch in authorization token (address=" + localAddress + " turl=" + file.getTurl() + ").");
+        try {
+            if (!Arrays.asList(InetAddress.getAllByName(file.getTurl().getHost())).contains(localAddress.getAddress())) {
+                throw new XrootdException(kXR_NotAuthorized, "Hostname mismatch in authorization token (address=" + localAddress + " turl=" + file.getTurl() + ").");
+            }
+        } catch (UnknownHostException e) {
+            throw new XrootdException(kXR_NotAuthorized, "Hostname in authorization token is not resolvable (turl=" + file.getTurl() + ").");
         }
 
-        int turlPort =
-            (file.getTurlPort() == -1)
-            ? XrootdProtocol.DEFAULT_PORT
-            : file.getTurlPort();
+        int turlPort = file.getTurl().getPort();
+        if (turlPort == -1) {
+            turlPort = XrootdProtocol.DEFAULT_PORT;
+        }
         if (turlPort != localAddress.getPort()) {
             throw new XrootdException(kXR_NotAuthorized, "Port mismatch in authorization token (address=" + localAddress + " turl=" + file.getTurl() + ").");
         }
@@ -122,7 +128,7 @@ public class TokenAuthorization1 implements AuthorizationHandler
             }
         }
 
-        return file.getTurlPath();
+        return file.getTurl().getPath();
     }
 
     private Envelope.GridFile findFile(String path, Envelope env)
