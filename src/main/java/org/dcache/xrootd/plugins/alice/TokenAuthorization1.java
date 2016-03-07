@@ -63,7 +63,8 @@ public class TokenAuthorization1 implements AuthorizationHandler
         if (authzTokenString == null) {
             if (request == XrootdProtocol.kXR_stat ||
                 request == XrootdProtocol.kXR_statx ||
-                request == XrootdProtocol.kXR_dirlist) {
+                request == XrootdProtocol.kXR_dirlist ||
+                request == XrootdProtocol.kXR_locate) {
                 return path;
             }
             throw new XrootdException(kXR_NotAuthorized, "An authorization token is required for this request.");
