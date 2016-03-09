@@ -17,6 +17,7 @@
     <connection>scm:git:git://github.com/dCache/ALICE-token-authorization-for-dCache.git</connection>
     <developerConnection>scm:git:git@github.com:dCache/ALICE-token-authorization-for-dCache.git</developerConnection>
     <url>http://github.com/dCache/ALICE-token-authorization-for-dCache</url>
+    <tag>release/1.1</tag>
   </scm>
 
   <repositories>
