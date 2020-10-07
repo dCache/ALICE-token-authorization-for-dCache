@@ -6,7 +6,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.security.auth.Subject;
 import javax.security.auth.login.CredentialException;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -171,15 +170,5 @@ public class TokenAuthorization1 implements AuthorizationHandler
             }
         }
         return keypair;
-    }
-
-    public static void main(String[] args)
-        throws Exception
-    {
-        TokenAuthorization1Factory factory =
-            new TokenAuthorization1Factory(new File(args[0]));
-        String token = args[1];
-        TokenAuthorization1 handler = factory.createHandler();
-        System.out.println(handler.decodeEnvelope(token, handler.getKeys(null)));
     }
 }

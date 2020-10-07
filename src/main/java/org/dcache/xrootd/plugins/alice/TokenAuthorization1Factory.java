@@ -1,5 +1,7 @@
 package org.dcache.xrootd.plugins.alice;
 
+import io.netty.channel.ChannelHandlerContext;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -23,7 +25,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.dcache.xrootd.plugins.AuthorizationFactory;
-import org.dcache.xrootd.plugins.AuthorizationHandler;
 import org.dcache.xrootd.util.ParseException;
 
 public class TokenAuthorization1Factory implements AuthorizationFactory
@@ -63,7 +64,7 @@ public class TokenAuthorization1Factory implements AuthorizationFactory
     }
 
     @Override
-    public TokenAuthorization1 createHandler()
+    public TokenAuthorization1 createHandler(ChannelHandlerContext ctx)
     {
         return new TokenAuthorization1(_keystore);
     }
